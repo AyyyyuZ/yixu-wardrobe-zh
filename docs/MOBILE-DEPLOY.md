@@ -120,3 +120,19 @@ sudo journalctl -u caddy -n 80 --no-pager
 ## 验证范围
 
 `npm test` 包含原项目测试及手机扩展的认证、CSRF、图片上传、重复检测、冲突保护、搭配保存、完整备份恢复、旧数据保留、路径穿越和篡改拒绝测试。浏览器流程另用 390×844 移动视口验证。真实 iPhone 的相册选择器、Safari 下载交互和目标云服务器证书签发需要部署后实机确认。
+
+## 已确认的旧 Caddy + yixu.service：自动切换
+
+如果原配置仅为 `127.0.0.1:4184` 转发到 `127.0.0.1:4183`，且旧衣橱由 `yixu.service` 管理，可以运行：
+
+```bash
+cd /home/ubuntu/apps/yixu-mobile
+git pull --ff-only
+YIXU_DATA_DIR=/home/ubuntu/apps/yixu/private-data bash scripts/deploy-existing-caddy.sh 你的公网IPv4
+```
+
+此脚本核对现有 Caddy 只有上述转发，核对运行中的旧服务的数据目录，安装依赖并运行测试，校验私人数据库并建立完整备份，另行备份 Caddyfile。输入新密码后，停止并禁用旧 `yixu.service`，配置新版 `yixu-mobile.service` 开机自启。新服务使用 **4186** 作为内部端口、**4185** 作为认证网关；旧 4184 转发不再使用。
+
+Caddy 复用已有安装，HTTPS 使用公网 IP 对应的 sslip.io 地址，绑定路由所指向的本地 IPv4 网卡，保留 Tailscale 网卡的 443 监听。不会修改 Tailscale Serve/Funnel；原来指向 4184 的 Tailscale 链接将暂时不可用，请使用脚本输出的 HTTPS 地址。若要恢复 Tailscale 访问，应将其目标改为带登录保护的 4185 网关，且手机端访问 origin 要与网关配置一致，不应直接转发内部 4186。
+
+切换过程中若新版不能启动或 Caddy 重载失败，脚本会停止新版，恢复原 Caddyfile，并按原状态启用/启动旧衣橱。备份保留不删除。脚本不等待外部证书签发；需在云安全组放行 80/443，再用 Safari 验证 HTTPS。现有配置与已确认结构不一致时脚本会退出，不覆盖其他网站。

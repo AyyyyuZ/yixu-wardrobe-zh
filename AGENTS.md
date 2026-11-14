@@ -16,3 +16,7 @@
 - Never publish a private development checkout or its historical commits. Use an audited source-only export for a public release. Do not rewrite published history without an explicit request.
 - Read README and docs/ARCHITECTURE.md for supported commands, boundaries, backup/restore and source export.
 - Read docs/AGENT-WORKFLOW.md before photo intake, outfit candidate work, or handing a wardrobe over to another chat. It contains reusable methods only; personal preferences and permissions come from the current wardrobe's private records.
+
+## Authorized mobile extension in this fork
+
+The owner explicitly requested login and mobile upload/management. `scripts/mobile-server.mjs` is the authenticated HTTPS gateway; the original local server remains loopback-only. Keep all writes at the live command boundary. Uploaded ordinary photos use truthful `original-photo` provenance, retain originals as registered immutable assets, and are not claimed to be segmented cutouts. Never proxy the underlying local write API to the internet. Mobile restores use a verified new directory, retain the previous library, and create a complete pre-switch backup. See docs/MOBILE-DEPLOY.md.

@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import {dataDirectory} from './data-paths.mjs';
+const origin=new URL(process.argv[2]||'');
+if(origin.protocol!=='https:'||origin.username||origin.password||origin.pathname!=='/'||origin.search||origin.hash)throw Error('请指定 HTTPS 域名，例如 https://wardrobe.example.com');
+const password=fs.readFileSync(0,'utf8').replace(/\r?\n$/,'');
+if(password.length<12||password.length>200)throw Error('密码应为 12–200 个字符');
+const controlDir=path.resolve(process.env.YIXU_MOBILE_CONTROL||path.join(dataDirectory(),'mobile-control'));
+fs.mkdirSync(controlDir,{recursive:true,mode:0o700});
+const salt=crypto.randomBytes(32).toString('hex'),passwordHash=crypto.scryptSync(password,salt,64).toString('hex');
+const filename=path.join(controlDir,'config.json');
+const old=fs.existsSync(filename)?JSON.parse(fs.readFileSync(filename,'utf8')):{};
+const config={...old,origin:origin.origin,salt,passwordHash,dataDir:old.dataDir||dataDirectory()};
+const temporary=filename+'.'+crypto.randomUUID();fs.writeFileSync(temporary,JSON.stringify(config,null,2),{flag:'wx',mode:0o600});fs.renameSync(temporary,filename);
+console.log('登录配置已保存。首次配置后可启动；改密码后请重启 mobile 服务，旧会话将失效。');

@@ -8,9 +8,9 @@ export function exportSource(target){
   function allowed(relative){
     if(relative==='docs/AGENT-WORKFLOW.md')return true;
     if(['docs/media/README.md','docs/media/video-poster.png','docs/media/outfits.png','docs/media/wardrobe.png','docs/media/shuffle.png','docs/media/overview.png','docs/media/preview.gif'].includes(relative))return true;
-    if(['README.md','AGENTS.md','LICENSE','SECURITY.md','package.json','.gitignore','启动衣橱.command','停止衣橱.command','Start Wardrobe.command','Stop Wardrobe.command','docs/ARCHITECTURE.md','docs/MAINTENANCE.md','docs/DEMO.md','docs/ci-workflow.yml.example','.github/workflows/test.yml'].includes(relative))return true;
+    if(['README.md','AGENTS.md','LICENSE','SECURITY.md','package.json','package-lock.json','docs/MOBILE-DEPLOY.md','.gitignore','启动衣橱.command','停止衣橱.command','Start Wardrobe.command','Stop Wardrobe.command','docs/ARCHITECTURE.md','docs/MAINTENANCE.md','docs/DEMO.md','docs/ci-workflow.yml.example','.github/workflows/test.yml'].includes(relative))return true;
     if(/^scripts\/(?:english-|localize-english|finalize-english)/.test(relative))return false;
-    if(/^scripts\/[\w-]+\.(mjs|zsh)$/.test(relative)||/^tests\/public\/[\w.-]+\.(mjs|js)$/.test(relative))return true;
+    if(/^scripts\/[\w-]+\.(mjs|zsh|sh)$/.test(relative)||/^tests\/public\/[\w.-]+\.(mjs|js)$/.test(relative))return true;
     if(/^dist\/(?:[\w-]+\.(js|css|html)|(?:data|views|compatibility)\/[\w-]+\.(js|json)|reviews\/(?:candidate-review|suggested-pieces)\.js)$/.test(relative))return true;
     return false;
   }

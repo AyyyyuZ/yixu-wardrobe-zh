@@ -9,3 +9,7 @@
 数据库快照只保存数据库内容。用 `scripts/backup-private.mjs` 连同已登记图片一起备份；恢复到新目录并核对，避免覆盖备份后继续做的修改。详见[维护说明](docs/MAINTENANCE.md#备份与恢复)。
 
 报告问题时，请使用合成资料和最小复现，不要在公开 issue 上传真实衣橱、照片、数据库或凭证。
+
+## 本副本的手机管理扩展
+
+用户明确授权的公网管理入口位于 `scripts/mobile-server.mjs`，必须通过 HTTPS 代理到 4185；它提供单人密码登录、Secure/HttpOnly/SameSite Cookie、CSRF 和来源校验、登录限流。底层本机服务 4184 和旧服务 4183 均不可直接开放公网。详细边界与备份限制见 [部署说明](docs/MOBILE-DEPLOY.md)。

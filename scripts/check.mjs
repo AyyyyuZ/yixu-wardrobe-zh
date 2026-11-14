@@ -19,7 +19,13 @@ if(index>=0){
       const bytes=fs.readFileSync(containedFile(path.join(dir,'public'),asset.relative_path));
       assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),asset.sha256,asset.url);
     }
-    for(const row of db.prepare('SELECT asset_url FROM garment_versions WHERE version=-1').all())inspectPNG(fs.readFileSync(containedFile(path.join(dir,'public'),row.asset_url)));
-    console.log('SQLite integrity, foreign keys, all registered hashes and current cutout alpha verified.');
+    for(const row of db.prepare('SELECT asset_url,data FROM garment_versions WHERE version=-1').all()){
+      const bytes=fs.readFileSync(containedFile(path.join(dir,'public'),row.asset_url));
+      if(JSON.parse(row.data).provenance?.processingMethod==='original-photo'){
+        const sharp=(await import('sharp')).default;
+        const meta=await sharp(bytes,{limitInputPixels:25e6}).metadata();assert.equal(meta.format,'png');await sharp(bytes,{limitInputPixels:25e6}).stats();
+      }else inspectPNG(bytes);
+    }
+    console.log('SQLite integrity, foreign keys, all registered hashes and reviewed cutout alpha / original-photo decoding verified.');
   }finally{db.close();}
 }else console.log('Application source verified. Use --data-dir /absolute/private/directory for private integrity checks.');
